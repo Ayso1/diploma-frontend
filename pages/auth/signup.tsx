@@ -6,6 +6,9 @@ import {
   Typography,
   Snackbar,
   Alert,
+  CircularProgress,
+  FormControl,
+  Fade,
 } from '@mui/material';
 import { object, string, InferType, ref } from 'yup';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
@@ -29,6 +32,7 @@ const schema = object({
 
 export const SignUp = () => {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = React.useState(false);
   const [er, setError] = useState(false);
   const handleClose = (
     event?: React.SyntheticEvent | Event,
@@ -38,6 +42,7 @@ export const SignUp = () => {
       return;
     }
     setOpen(false);
+    setError(false);
   };
   const {
     handleSubmit,
@@ -47,15 +52,18 @@ export const SignUp = () => {
     resolver: yupResolver(schema),
   });
   const onSubmit = async (data) => {
+    setLoading(true);
     const _ = require('lodash');
     let newdata = _.cloneDeep(data);
     delete newdata.passwordConfirm;
-    if ((await doPostRequest(newdata)) == false) {
-      setError(true);
-    } else {
+    try {
+      await doPostRequest(newdata);
+      setLoading(false);
       setOpen(true);
+    } catch (error) {
+      setLoading(false);
+      setError(true);
     }
-    //setOpen(true);
   };
 
   return (
@@ -187,14 +195,24 @@ export const SignUp = () => {
                 />
               )}
             />
+
             <Button
               type="submit"
               variant="contained"
+              disabled={loading}
               startIcon={<AppRegistrationIcon />}
             >
               Sigh up
             </Button>
-
+            {loading && (
+              <CircularProgress
+                size={70}
+                sx={{
+                  transitionDelay: '1000ms',
+                  position: 'absolute',
+                }}
+              />
+            )}
             <Snackbar
               open={open}
               autoHideDuration={3000}
