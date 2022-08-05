@@ -1,9 +1,17 @@
-import React, { FC } from 'react';
-import { Button, TextField, Grid, Typography } from '@mui/material';
+import React, { FC, useState } from 'react';
+import {
+  Button,
+  TextField,
+  Grid,
+  Typography,
+  Snackbar,
+  Alert,
+} from '@mui/material';
 import { object, string, InferType, ref } from 'yup';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import doPostRequest from '../../src/http/auth/signup';
 
 const schema = object({
   firstName: string().required('First name is required'),
@@ -20,6 +28,17 @@ const schema = object({
 });
 
 export const SignUp = () => {
+  const [open, setOpen] = useState(false);
+  const [er, setError] = useState(false);
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
   const {
     handleSubmit,
     control,
@@ -27,11 +46,16 @@ export const SignUp = () => {
   } = useForm({
     resolver: yupResolver(schema),
   });
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const _ = require('lodash');
     let newdata = _.cloneDeep(data);
     delete newdata.passwordConfirm;
-    alert(JSON.stringify(newdata));
+    if ((await doPostRequest(newdata)) == false) {
+      setError(true);
+    } else {
+      setOpen(true);
+    }
+    //setOpen(true);
   };
 
   return (
@@ -170,6 +194,36 @@ export const SignUp = () => {
             >
               Sigh up
             </Button>
+
+            <Snackbar
+              open={open}
+              autoHideDuration={3000}
+              onClose={handleClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+              <Alert
+                onClose={handleClose}
+                severity="success"
+                sx={{ width: '100%' }}
+              >
+                Success!
+              </Alert>
+            </Snackbar>
+
+            <Snackbar
+              open={er}
+              autoHideDuration={3000}
+              onClose={handleClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+              <Alert
+                onClose={handleClose}
+                severity="error"
+                sx={{ width: '100%' }}
+              >
+                Error!
+              </Alert>
+            </Snackbar>
           </Grid>
         </Grid>
       </Grid>
