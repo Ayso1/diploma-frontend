@@ -208,7 +208,6 @@ export const SignUp = () => {
               <CircularProgress
                 size={70}
                 sx={{
-                  transitionDelay: '1000ms',
                   position: 'absolute',
                 }}
               />
