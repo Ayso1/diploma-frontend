@@ -7,10 +7,8 @@ import {
   Snackbar,
   Alert,
   CircularProgress,
-  FormControl,
-  Fade,
 } from '@mui/material';
-import { object, string, InferType, ref } from 'yup';
+import { object, string, ref } from 'yup';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -247,5 +245,5 @@ export const SignUp = () => {
     </form>
   );
 };
-//export default SignUp;
+
 export default SignUp;

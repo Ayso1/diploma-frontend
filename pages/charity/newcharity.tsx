@@ -2,32 +2,30 @@ import React, { FC, useState } from 'react';
 import {
   Button,
   TextField,
-  Grid,
-  Fab,
   Typography,
   Box,
-  Paper,
   InputLabel,
   FormControl,
   MenuItem,
   Snackbar,
   Alert,
   CircularProgress,
-  Card,
-  CardActionArea,
-  CardMedia,
 } from '@mui/material';
-import { object, string, InferType, ref } from 'yup';
+import { object, string } from 'yup';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-//import doPost from '../../src/http/charity/newcharity';
+import doPost from '../../src/http/charity/newcharity';
 import ImagesContainer from '../../src/components/form-controls/ImagesContainer';
+import ReactSelect from 'react-select';
 
 const schema = object({
   title: string().required('Title is required'),
-  descriptions: string().required('Descriptions is required'),
+  description: string().required('Descriptions is required'),
+  //photos: string().required('Photos is required'),
+  //userId: string().required('user id is required'),
+  categorieId: string().required('Categorie is required'),
 });
 
 export const CreateCharity = () => {
@@ -65,14 +63,10 @@ export const CreateCharity = () => {
     resolver: yupResolver(schema),
   });
   const onSubmit = async (data) => {
+    alert(JSON.stringify(data));
     setLoading(true);
-    const _ = require('lodash');
-    let newdata = _.cloneDeep(data);
-    delete newdata.passwordConfirm;
     try {
-      //console.log(file);
-      //await getPhotoLinks(file);
-      //console.log(getPhotoLinks(file));
+      //await doPost(data);
       setLoading(false);
       setOpen(true);
     } catch (error) {
@@ -107,17 +101,25 @@ export const CreateCharity = () => {
         </Box>
         <FormControl>
           <InputLabel id="demo-simple-select-label">Category</InputLabel>
-          <Select
-            labelId="category-select-label"
-            id="category-select"
-            value={category}
-            label="Category"
-            style={{ width: 400, marginBottom: '1.5em' }}
-            onChange={handleChange}
-          >
-            <MenuItem value={1}>Housing</MenuItem>
-            <MenuItem value={2}>Сlothing</MenuItem>
-          </Select>
+          <Controller
+            name="categorieId"
+            control={control}
+            defaultValue=""
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <Select
+                labelId="categorieId"
+                id="categorieId"
+                value={value}
+                label="Category"
+                style={{ width: 400, marginBottom: '1.5em' }}
+                onChange={onChange}
+                error={!!error}
+              >
+                <MenuItem value={1}>Housing</MenuItem>
+                <MenuItem value={2}>Сlothing</MenuItem>
+              </Select>
+            )}
+          />
         </FormControl>
 
         <Box>
@@ -142,36 +144,20 @@ export const CreateCharity = () => {
             )}
           />
         </Box>
-        <ImagesContainer name="photos" register={register} />
         <Box>
-          <TextField
-            name="upload-photo"
-            type="file"
-            style={{ width: 400, marginBottom: '1.5em' }}
-            variant="outlined"
-            inputProps={{
-              multiple: true,
-            }}
-            onChange={handleChangePhoto}
+          <Controller
+            name="photos"
+            control={control}
+            render={({ field }) => (
+              <ImagesContainer {...field} name="photos" register={register} />
+            )}
           />
-          {file.length > 0 && (
-            <Card sx={{ maxWidth: 345, alignItems: 'center' }}>
-              <CardActionArea>
-                <CardMedia
-                  component="img"
-                  alt="Photo"
-                  height="194"
-                  image={file}
-                  title="Photo"
-                />
-              </CardActionArea>
-            </Card>
-          )}
         </Box>
 
         <Button
           type="submit"
           variant="contained"
+          disabled={loading}
           startIcon={<AppRegistrationIcon />}
         >
           Create a post
