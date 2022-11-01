@@ -11,6 +11,7 @@ import axios from 'axios';
 import { Theme } from '@material-ui/core/styles';
 import imageCompression from 'browser-image-compression';
 import config from '../../config';
+import { ControllerRenderProps } from 'react-hook-form';
 
 const IMG_CONTAINER_DEFAULT_SIZE = '120px';
 
@@ -56,11 +57,10 @@ interface ImageData {
   filename: string;
 }
 
-interface Props {
+interface Props extends ControllerRenderProps<any, any> {
   hideTitle?: boolean;
   maxCount?: number;
   imageContainerSize?: any;
-  register: any;
   name: string;
   alignGridItems?: 'flex-start' | 'flex-end';
 }
@@ -68,12 +68,12 @@ interface Props {
 const name = 'images';
 
 export const ImagesContainer: FC<Props> = (props) => {
-  const { hideTitle, maxCount = 10, register, name } = props;
+  const { hideTitle, maxCount = 10, name, onChange, value: formValue } = props;
   const classes = useStyles(props);
   let uploadFile;
   //const [uploadFile] = getPhotoLinks(value);
   //const [uploadFile] = useUploadFileMutation();
-  const [value, setValue] = useState([]);
+  const [value, setValue] = useState(formValue ?? []);
   const [file, setFile] = useState();
   const [fileName, setFileName] = useState('');
 
@@ -116,6 +116,7 @@ export const ImagesContainer: FC<Props> = (props) => {
           const image = { url, filename };
           values = [...values, image];
           setValue(values);
+          onChange(values);
         }
       } catch (e) {
         console.log(e);
@@ -167,11 +168,7 @@ export const ImagesContainer: FC<Props> = (props) => {
           {!hideAdd && (
             <Grid item {...getRootProps()}>
               <Box>
-                <input
-                  {...register(name)}
-                  {...getInputProps()}
-                  onChange={saveFile}
-                />
+                <input {...getInputProps()} onChange={saveFile} />
 
                 <AddIcon fontSize="large" />
               </Box>

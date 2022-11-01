@@ -10,6 +10,7 @@ import {
   Snackbar,
   Alert,
   CircularProgress,
+  Grid,
 } from '@mui/material';
 import { object, string } from 'yup';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
@@ -66,7 +67,7 @@ export const CreateCharity = () => {
     alert(JSON.stringify(data));
     setLoading(true);
     try {
-      //await doPost(data);
+      await doPost(data);
       setLoading(false);
       setOpen(true);
     } catch (error) {
@@ -144,16 +145,22 @@ export const CreateCharity = () => {
             )}
           />
         </Box>
-        <Box>
-          <Controller
-            name="photos"
-            control={control}
-            render={({ field }) => (
-              <ImagesContainer {...field} name="photos" register={register} />
-            )}
-          />
-        </Box>
-
+        <Grid
+          container
+          direction="column"
+          justifyContent="flex-end"
+          alignItems="center"
+        >
+          <Grid item>
+            <Controller
+              name="photos"
+              control={control}
+              render={({ field }) => (
+                <ImagesContainer {...field} name="photos" />
+              )}
+            />
+          </Grid>
+        </Grid>
         <Button
           type="submit"
           variant="contained"
