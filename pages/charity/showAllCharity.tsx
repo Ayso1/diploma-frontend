@@ -1,7 +1,6 @@
 import React, { FC, useState, useEffect } from 'react';
 import {
   Button,
-  TextField,
   Grid,
   AppBar,
   Toolbar,
@@ -10,42 +9,64 @@ import {
   Typography,
   Box,
   InputLabel,
-  Snackbar,
-  Alert,
-  CircularProgress,
   Select,
   MenuItem,
   FormControl,
   ButtonBase,
 } from '@mui/material';
-import CatchingPokemonIcon from '@mui/icons-material/CatchingPokemon';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+
 import SearchIcon from '@mui/icons-material/Search';
 import SinglePost from '../../src/components/form-controls/AdContainer';
 import getCharity from '../../src/http/charity/getAllCharity';
 import axios from 'axios';
 import config from '../../src/config';
-import { useNavigate } from 'react-router-dom';
-
-const Users = () => {
-  const navigate = useNavigate();
-  const goToPosts = () =>
-    navigate({
-      pathname: '/charity/showAllCharity',
-      search: '?sort=date&order=newest',
-    });
-};
 
 export const MainPage = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = React.useState(false);
+  const [selectItem, setSelect] = useState();
   const allData = async () => {
     setLoading(true);
+    const url = `${config.apiUrl}/charity`;
     axios
-      .get(
-        `${config.apiUrl}/charity?filterByCategoriesId=1&limit=2&offset=1&sortBy=title&sortDirection=ASC`
-      )
+      .get(url, {
+        params: {
+          //filterByCategoriesId: '1',
+        },
+      })
+      .then(
+        (res) => {
+          console.log(res);
+          setData(
+            res.data.data.map(({ createdAt, photos, ...res }) => ({
+              ...res,
+              photos: JSON.parse(photos),
+              createdAt: new Date(createdAt),
+            }))
+          );
+        },
+        (error) => {
+          console.error('Error fetching data: ', error);
+        }
+      );
+    setLoading(false);
+  };
+  useEffect(() => {
+    allData();
+  }, []);
+  const handleChange = (e) => {
+    setSelect(e.target.value);
+  };
+  const handleClick = (e) => {
+    setLoading(true);
+    e.preventDefault();
+    const url = `${config.apiUrl}/charity`;
+    axios
+      .get(url, {
+        params: {
+          filterByCategoriesId: selectItem,
+        },
+      })
       .then(
         (res) => {
           console.log(res);
@@ -57,34 +78,9 @@ export const MainPage = () => {
       );
     setLoading(false);
   };
-  useEffect(() => {
-    allData();
-  }, []);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="logo"
-          >
-            <CatchingPokemonIcon />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 2 }}>
-            VRAPP
-          </Typography>
-          <Stack direction="row" spacing={3}></Stack>
-          <Button color="inherit" startIcon={<AddCircleIcon />}>
-            Add new ad
-          </Button>
-          <Button color="inherit" startIcon={<AccountCircleIcon />}>
-            Your profile
-          </Button>
-        </Toolbar>
-      </AppBar>
       <Box>
         <Grid
           container
@@ -101,6 +97,8 @@ export const MainPage = () => {
                 labelId="categorieId"
                 id="categorieId"
                 label="Category"
+                value={selectItem}
+                onChange={handleChange}
                 style={{ width: 300, marginBottom: '1.5em' }}
               >
                 <MenuItem value="">
@@ -114,6 +112,7 @@ export const MainPage = () => {
               type="submit"
               variant="contained"
               style={{ width: 'flex', marginBottom: '1.5em', height: 60 }}
+              onClick={handleClick}
               startIcon={<SearchIcon />}
             >
               Search
