@@ -1,48 +1,42 @@
 import React, { FC, useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import {
   Button,
   Grid,
+  AppBar,
+  Toolbar,
+  IconButton,
+  Stack,
+  Typography,
   Box,
   InputLabel,
   Select,
   MenuItem,
   FormControl,
   ButtonBase,
-  Typography,
 } from '@mui/material';
 
 import SearchIcon from '@mui/icons-material/Search';
-import SinglePost from '../src/components/form-controls/AdContainer';
-import getCharity from '../src/http/charity/getAllCharity';
+import SinglePost from '../../src/components/form-controls/AdContainer';
+import getCharity from '../../src/http/charity/getAllCharity';
 import axios from 'axios';
-import config from '../src/config';
-import AppLink from '../src/components/form-controls/AppLink';
-import Pagination from '../src/components/form-controls/Pagination';
-import PaginationM from '../src/components/form-controls/PaginationMaterial';
+import config from '../../src/config';
 
-export default function Home() {
+export const MainPage = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = React.useState(false);
   const [selectItem, setSelect] = useState();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [postPerPage] = useState(8);
-  const router = useRouter();
-
   const allData = async () => {
     setLoading(true);
     const url = `${config.apiUrl}/charity`;
-    let query = window.location.href;
-    const queryUrl = new URL(query);
-    let categorieIdForFilter = queryUrl.searchParams.get('key');
     axios
       .get(url, {
         params: {
-          filterByCategoriesId: categorieIdForFilter,
+          //filterByCategoriesId: '1',
         },
       })
       .then(
         (res) => {
+          console.log(res);
           setData(
             res.data.data.map(({ createdAt, photos, ...res }) => ({
               ...res,
@@ -60,7 +54,6 @@ export default function Home() {
   useEffect(() => {
     allData();
   }, []);
-
   const handleChange = (e) => {
     setSelect(e.target.value);
   };
@@ -77,16 +70,7 @@ export default function Home() {
       .then(
         (res) => {
           console.log(res);
-          router.replace({
-            query: { ...router.query, key: selectItem },
-          });
-          setData(
-            res.data.data.map(({ createdAt, photos, ...res }) => ({
-              ...res,
-              photos: JSON.parse(photos),
-              createdAt: new Date(createdAt),
-            }))
-          );
+          setData(res.data.data);
         },
         (error) => {
           console.error('Error fetching data: ', error);
@@ -94,10 +78,7 @@ export default function Home() {
       );
     setLoading(false);
   };
-  const indexOfLastPost = currentPage * postPerPage;
-  const indexOfFirstPost = indexOfLastPost - postPerPage;
-  const currentPost = data.slice(indexOfFirstPost, indexOfLastPost);
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Box>
@@ -140,23 +121,18 @@ export default function Home() {
         </Grid>
       </Box>
       <Grid container>
-        {currentPost.map((item) => (
+        {data.map((item) => (
           <Grid item key={item.id} xs={6} md={3} lg={3} p={3}>
             <ButtonBase onClick={() => {}}>
-              <AppLink href={'/charity/' + item.id}>
+              <a href={'/charity/' + item.id}>
                 <SinglePost data={item} />
-              </AppLink>
+              </a>
             </ButtonBase>
           </Grid>
         ))}
       </Grid>
-      <Grid direction="column" justifyContent="flex-end" alignItems="center">
-        <PaginationM
-          postsPerPage={postPerPage}
-          totalPosts={data.length}
-          paginate={paginate}
-        />
-      </Grid>
     </Box>
   );
-}
+};
+
+export default MainPage;
