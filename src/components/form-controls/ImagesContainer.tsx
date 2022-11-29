@@ -7,11 +7,10 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import { useDropzone } from 'react-dropzone';
 import { makeStyles } from '@mui/styles';
-import getPhotoLinks from '../../http/charity/getPhotoLink';
-import deletePhoto from '../../http/charity/deletePhoto';
-
+import axios from 'axios';
 import { Theme } from '@material-ui/core/styles';
 import imageCompression from 'browser-image-compression';
+import config from '../../config';
 
 const IMG_CONTAINER_DEFAULT_SIZE = '120px';
 
@@ -75,10 +74,17 @@ export const ImagesContainer: FC<Props> = (props) => {
   //const [uploadFile] = getPhotoLinks(value);
   //const [uploadFile] = useUploadFileMutation();
   const [value, setValue] = useState([]);
+  const [file, setFile] = useState();
+  const [fileName, setFileName] = useState('');
+
+  const saveFile = (acceptedFiles) => {
+    setFile(acceptedFiles.target.files[0]);
+    setFileName(acceptedFiles.target.files[0].name);
+  };
+
   const onDrop = useCallback(
     async (acceptedFiles) => {
       try {
-        console.log(acceptedFiles);
         const files = acceptedFiles.slice(0, maxCount);
         let values = [...value];
 
@@ -92,33 +98,45 @@ export const ImagesContainer: FC<Props> = (props) => {
             maxSizeMB: 10,
           });
 
-          const response = await uploadFile({
-            variables: {
-              file: compressedFile,
-              pathEntries: ['image'],
+          const data = new FormData();
+          data.append('file', compressedFile);
+
+          const res = await axios.post(`${config.apiUrl}/upload`, data, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
             },
           });
+          //console.log(res);
 
-          const { url, filename } = response.data?.uploadFile!;
+          //todo: my post must return url and filename
+          //const {url, filename } = res.data?
+          //const { url, filename } = res.data?.uploadFile!;
+          const url = res.data.link;
+          const filename = res.data.filename;
           const image = { url, filename };
           values = [...values, image];
           setValue(values);
         }
       } catch (e) {
-        //showError(<Trans>Failed to upload image</Trans>);
+        console.log(e);
       }
     },
     [uploadFile, maxCount, value, setValue]
   );
 
-  const onImageDelete = (image: ImageData) => {
-    let index = value.indexOf(image);
-    let newvalue = [...value];
-    console.log(getPhotoLinks(image.filename));
-    //deletePhoto(image.filename);
-    newvalue.splice(index, 1);
-    setValue(newvalue);
-    console.log(value);
+  const onImageDelete = async (image: ImageData) => {
+    try {
+      let index = value.indexOf(image);
+      let newvalue = [...value];
+      newvalue.splice(index, 1);
+      const res = await axios.delete(
+        `${config.apiUrl}/upload/${image.filename}`
+      );
+      setValue(newvalue);
+      console.log(value);
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -142,13 +160,19 @@ export const ImagesContainer: FC<Props> = (props) => {
                     <DeleteIcon />
                   </IconButton>
                 }
+                <Image src={image.url} className={classes.image} />
               </Grid>
             );
           })}
           {!hideAdd && (
             <Grid item {...getRootProps()}>
               <Box>
-                <input {...register(name)} {...getInputProps()} />
+                <input
+                  {...register(name)}
+                  {...getInputProps()}
+                  onChange={saveFile}
+                />
+
                 <AddIcon fontSize="large" />
               </Box>
             </Grid>
