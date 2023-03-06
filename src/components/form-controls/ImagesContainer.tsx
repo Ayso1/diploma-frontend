@@ -71,8 +71,6 @@ export const ImagesContainer: FC<Props> = (props) => {
   const { hideTitle, maxCount = 10, name, onChange, value: formValue } = props;
   const classes = useStyles(props);
   let uploadFile;
-  //const [uploadFile] = getPhotoLinks(value);
-  //const [uploadFile] = useUploadFileMutation();
   const [value, setValue] = useState(formValue ?? []);
   const [file, setFile] = useState();
   const [fileName, setFileName] = useState('');

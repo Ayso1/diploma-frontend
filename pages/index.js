@@ -14,7 +14,6 @@ import {
 
 import SearchIcon from '@mui/icons-material/Search';
 import SinglePost from '../src/components/form-controls/AdContainer';
-import getCharity from '../src/http/charity/getAllCharity';
 import axios from 'axios';
 import config from '../src/config';
 import AppLink from '../src/components/form-controls/AppLink';
@@ -107,7 +106,7 @@ export default function Home() {
           justifyContent="flex-end"
           alignItems="center"
           style={{ minHeight: '15vh' }}
-          spacing={3}
+          spacing={2}
         >
           <Grid item>
             <FormControl>
@@ -125,6 +124,13 @@ export default function Home() {
                 </MenuItem>
                 <MenuItem value={1}>Housing</MenuItem>
                 <MenuItem value={2}>Сlothing</MenuItem>
+                <MenuItem value={3}>Transport</MenuItem>
+                <MenuItem value={4}>For animals</MenuItem>
+                <MenuItem value={5}>For kids</MenuItem>
+                <MenuItem value={6}>Medications and hygiene products</MenuItem>
+                <MenuItem value={7}>Work</MenuItem>
+                <MenuItem value={8}>Medical care</MenuItem>
+                <MenuItem value={9}>Requests for help</MenuItem>
               </Select>
             </FormControl>
             <Button
@@ -150,12 +156,21 @@ export default function Home() {
           </Grid>
         ))}
       </Grid>
-      <Grid direction="column" justifyContent="flex-end" alignItems="center">
-        <PaginationM
-          postsPerPage={postPerPage}
-          totalPosts={data.length}
-          paginate={paginate}
-        />
+      <Grid
+        container
+        direction="column"
+        justifyContent="flex-end"
+        alignItems="center"
+        style={{ minHeight: '5vh' }}
+        spacing={1}
+      >
+        <Grid direction="column" justifyContent="flex-end" alignItems="center">
+          <PaginationM
+            postsPerPage={postPerPage}
+            totalPosts={data.length}
+            paginate={paginate}
+          />
+        </Grid>
       </Grid>
     </Box>
   );

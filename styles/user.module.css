@@ -1,0 +1,26 @@
+.container {
+  width: 100%;
+  min-height: 100vh;
+  max-height: 100%;
+  background-color: #d0eaff;
+  align-items: flex-start;
+}
+
+.form {
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+  display: flex;
+  padding: 2rem 2rem;
+  box-shadow: 0 1px 25px rgba(4, 3, 82, 0.2);
+  height: 5vh;
+  flex-basis: 100%;
+}
+.form h1 {
+  margin: 0px;
+  font-size: 35px;
+}
+.form button {
+  margin: 0px;
+  margin-left: auto;
+}

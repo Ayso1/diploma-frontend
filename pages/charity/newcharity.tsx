@@ -19,19 +19,23 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import doPost from '../../src/http/charity/newcharity';
 import ImagesContainer from '../../src/components/form-controls/ImagesContainer';
+import { useRouter } from 'next/router';
 import ReactSelect from 'react-select';
 
 const schema = object({
   title: string().required('Title is required'),
-  description: string().required('Descriptions is required'),
+  description: string().required('Description is required'),
+  contacts: string().required('Contacts is required'),
   //photos: string().required('Photos is required'),
   //userId: string().required('user id is required'),
   categorieId: string().required('Categorie is required'),
 });
 
 export const CreateCharity = () => {
+  const router = useRouter();
   const [category, setCategory] = useState('');
   const [file, setFile] = useState('');
+
   const handleChange = (event: SelectChangeEvent) => {
     setCategory(event.target.value as string);
   };
@@ -64,12 +68,12 @@ export const CreateCharity = () => {
     resolver: yupResolver(schema),
   });
   const onSubmit = async (data) => {
-    alert(JSON.stringify(data));
     setLoading(true);
     try {
-      await doPost(data);
+      await doPost(data, localStorage.getItem('id'));
       setLoading(false);
       setOpen(true);
+      router.push('http://localhost:3001');
     } catch (error) {
       setLoading(false);
       setError(true);
@@ -78,7 +82,9 @@ export const CreateCharity = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Box textAlign={'center'} display="block" p={5} gap={2}>
-        <Typography variant="h2">Create a post</Typography>
+        <Typography variant="h2" color="#1976d2">
+          Create a post
+        </Typography>
 
         <Box pt={3}>
           <Controller
@@ -118,6 +124,13 @@ export const CreateCharity = () => {
               >
                 <MenuItem value={1}>Housing</MenuItem>
                 <MenuItem value={2}>Сlothing</MenuItem>
+                <MenuItem value={3}>Transport</MenuItem>
+                <MenuItem value={4}>For animals</MenuItem>
+                <MenuItem value={5}>For kids</MenuItem>
+                <MenuItem value={6}>Medications and hygiene products</MenuItem>
+                <MenuItem value={7}>Work</MenuItem>
+                <MenuItem value={8}>Medical care</MenuItem>
+                <MenuItem value={9}>Requests for help</MenuItem>
               </Select>
             )}
           />
@@ -136,6 +149,28 @@ export const CreateCharity = () => {
                 rows={5}
                 required
                 id="description"
+                style={{ width: 400, marginBottom: '1.5em' }}
+                value={value}
+                onChange={onChange}
+                error={!!error}
+                helperText={error ? error.message : null}
+              />
+            )}
+          />
+        </Box>
+        <Box>
+          <Controller
+            name="contacts"
+            control={control}
+            defaultValue=""
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <TextField
+                label="Contacts:"
+                variant="outlined"
+                multiline
+                rows={3}
+                required
+                id="contacts"
                 style={{ width: 400, marginBottom: '1.5em' }}
                 value={value}
                 onChange={onChange}
