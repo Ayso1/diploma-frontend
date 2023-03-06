@@ -1,0 +1,36 @@
+.container {
+  display: flex;
+  position: relative;
+  top: 50vh;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: #00328f;
+}
+.form {
+  position: absolute;
+  display: grid;
+  padding: 4rem 2rem;
+  border-radius: 1em;
+  box-shadow: 0 1px 25px rgba(4, 3, 82, 0.2);
+  height: 55vh;
+}
+.formTitle {
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  color: #1976d2;
+}
+.form_div {
+  justify-content: center;
+  align-items: center;
+  display: grid;
+  height: 48px;
+  margin-bottom: 1.5rem;
+}
+.from_div2 {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+}

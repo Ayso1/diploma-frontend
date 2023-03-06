@@ -1,6 +1,7 @@
 import React from 'react';
 import Pagination from '@mui/material/Pagination';
 import { Grid } from '@mui/material';
+import styles from '../../../styles/pagination.module.css';
 
 const PaginationM = ({ postsPerPage, totalPosts, paginate }) => {
   const pageNumbers = [];
@@ -12,13 +13,16 @@ const PaginationM = ({ postsPerPage, totalPosts, paginate }) => {
     paginate(value);
   };
   return (
-    <Grid>
-      <Pagination
-        count={pageNumbers.length}
-        color="primary"
-        onChange={handleChange}
-      />
-    </Grid>
+    <div className={styles.container}>
+      <Grid direction="column" justifyContent="flex-end" alignItems="center">
+        <Pagination
+          className={styles.pagination}
+          count={pageNumbers.length}
+          color="primary"
+          onChange={handleChange}
+        />
+      </Grid>
+    </div>
   );
 };
 export default PaginationM;
